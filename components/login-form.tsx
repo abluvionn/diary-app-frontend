@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { useAppDispatch } from '@/lib/hooks';
 import { login } from '@/lib/features/users/usersThunks';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   email: z.string().min(1, { message: 'Email is required.' }).email('This is not a valid email.'),
@@ -16,6 +17,7 @@ const formSchema = z.object({
 });
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -27,7 +29,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-    await dispatch(login(values));
+    await dispatch(login(values)).unwrap();
+    router.push('/');
   };
 
   return (

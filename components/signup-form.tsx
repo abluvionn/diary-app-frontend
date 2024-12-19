@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useForm } from 'react-hook-form';
 import { register } from '@/lib/features/users/usersThunks';
 import { useAppDispatch } from '@/lib/hooks';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z
   .object({
@@ -22,6 +23,7 @@ const formSchema = z
   });
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,6 +37,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
     await dispatch(register({ email: values.email, password: values.password }));
+    router.push('/');
   };
 
   return (
