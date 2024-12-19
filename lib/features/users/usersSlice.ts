@@ -41,4 +41,4 @@ export const { unsetUser, updateState } = usersSlice.actions;
 
 export const usersReducer = usersSlice.reducer;
 
-export const selectUser = (state: RootState) => state.users.user;
+export const selectUser = (state: RootState) => state.users.user?.user;
