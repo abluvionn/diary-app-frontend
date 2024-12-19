@@ -5,45 +5,36 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 import { useForm } from 'react-hook-form';
+import { register } from '@/lib/features/users/usersThunks';
+import { useAppDispatch } from '@/lib/hooks';
 
 const formSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, { message: 'Email is required.' })
-      .email('This is not a valid email.'),
+    email: z.string().min(1, { message: 'Email is required.' }).email('This is not a valid email.'),
     password: z.string().min(1, { message: 'Password is required.' }),
-    confirmPassword: z.string().min(1, { message: 'Confirm password.' }),
+    confirmPassword: z.string().min(1, { message: 'Confirm password.' })
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ['confirmPassword'],
+    path: ['confirmPassword']
   });
 
-export function SignUpForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
+export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
-      confirmPassword: '',
-    },
+      confirmPassword: ''
+    }
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    await dispatch(register({ email: values.email, password: values.password }));
   };
 
   return (
@@ -103,9 +94,7 @@ export function SignUpForm({
                     name='confirmPassword'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel htmlFor='confirm-password'>
-                          Confirm Password
-                        </FormLabel>
+                        <FormLabel htmlFor='confirm-password'>Confirm Password</FormLabel>
                         <FormControl>
                           <Input
                             id='confirm-password'

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { login, logout } from './usersThunks';
+import { login, logout, register } from './usersThunks';
 import { RegisterResponse } from '@/types/user';
 import { RootState } from '@/lib/store';
 
@@ -23,6 +23,9 @@ export const usersSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(register.fulfilled, (state, {payload: user}: PayloadAction<RegisterResponse>) => {
+      state.user = user;
+    })
     builder
       .addCase(login.fulfilled, (state, { payload: user }: PayloadAction<RegisterResponse>) => {
         state.user = user;

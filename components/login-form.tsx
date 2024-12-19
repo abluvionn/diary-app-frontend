@@ -1,48 +1,33 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from './ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { useAppDispatch } from '@/lib/hooks';
+import { login } from '@/lib/features/users/usersThunks';
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Email is required.' })
-    .email('This is not a valid email.'),
-  password: z.string().min(1, { message: 'Password is required.' }),
+  email: z.string().min(1, { message: 'Email is required.' }).email('This is not a valid email.'),
+  password: z.string().min(1, { message: 'Password is required.' })
 });
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
+export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
+  const dispatch = useAppDispatch();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      password: '',
-    },
+      password: ''
+    }
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+    await dispatch(login(values));
   };
 
   return (
@@ -50,9 +35,7 @@ export function LoginForm({
       <Card>
         <CardHeader>
           <CardTitle className='text-2xl'>Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
