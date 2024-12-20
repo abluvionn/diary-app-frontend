@@ -28,7 +28,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
     await dispatch(login(values)).unwrap();
     router.push('/');
   };
