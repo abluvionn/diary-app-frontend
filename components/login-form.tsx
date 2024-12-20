@@ -28,8 +28,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await dispatch(login(values)).unwrap();
-    router.push('/');
+    try {
+      await dispatch(login(values)).unwrap();
+      router.push('/');
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (

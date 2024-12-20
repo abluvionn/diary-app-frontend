@@ -25,7 +25,9 @@ import { API_URL } from '@/lib/constants';
 import { selectUser } from '@/lib/features/users/usersSlice';
 import { useAppSelector } from '@/lib/hooks';
 import { Entry } from '@/types/entry';
+import { ValidationError } from '@/types/error';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAxiosError } from 'axios';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -47,6 +49,7 @@ export default function Home() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [validationError, setValidationError] = useState<null | ValidationError>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,13 +87,17 @@ export default function Home() {
       const response = await axiosApi.post<Entry>('/entries', formData);
 
       if (!response.data) {
-        return
+        return;
       }
 
       setIsOpen(false);
-      setEntries(prevEntries => [...prevEntries, response.data])
-    } catch (error) {
-      console.log(error);
+      setEntries((prevEntries) => [...prevEntries, response.data]);
+      form.reset();
+      setValidationError(null);
+    } catch (e) {
+      if (isAxiosError(e) && e.response && e.response.status === 422) {
+        setValidationError(e.response.data as ValidationError);
+      }
     }
   };
 
@@ -129,7 +136,11 @@ export default function Home() {
                             <FormControl>
                               <Input id='title' type='text' {...field} />
                             </FormControl>
-                            <FormMessage />
+                            {validationError ? (
+                              <FormMessage>{validationError.errors['title'].message}</FormMessage>
+                            ) : (
+                              <FormMessage />
+                            )}
                           </FormItem>
                         )}
                       />

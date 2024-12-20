@@ -35,8 +35,12 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await dispatch(register({ email: values.email, password: values.password }));
-    router.push('/');
+    try {
+      await dispatch(register({ email: values.email, password: values.password })).unwrap();
+      router.push('/');
+    } catch (e) {
+      console.log(e)
+    }
   };
 
   return (

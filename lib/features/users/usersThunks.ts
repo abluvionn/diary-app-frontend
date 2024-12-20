@@ -13,7 +13,7 @@ export const register = createAsyncThunk<
     const response = await axiosApi.post<RegisterResponse>('/users', registerForm);
     return response.data;
   } catch (error) {
-    if (isAxiosError(error) && error.response && error.response.status === 400) {
+    if (isAxiosError(error) && error.response && error.response.status === 422) {
       return rejectWithValue(error.response.data as ValidationError);
     }
     throw error;
